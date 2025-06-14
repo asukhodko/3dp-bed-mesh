@@ -1,5 +1,5 @@
-import sys
-sys.path.append("/mnt/data")
+# import sys
+# sys.path.append("/mnt/data")
 
 from parse_bed_mesh import parse_bed_mesh
 from interpolate_bed_mesh_surface import interpolate_surface
@@ -7,9 +7,9 @@ from generate_stl_from_surface import generate_stl_from_surface
 from smooth_surface import smooth_surface_laplacian_partial
 
 
-def generate_stl_from_bed_mesh_text(text: str, smooth_iterations: int = 3, resolution: int = 50, output_path: str = "bed_mesh_model.stl") -> str:
+def generate_stl_from_bed_mesh_text(text: str, resolution: int = 50, output_path: str = "bed_mesh_model.stl") -> str:
     mesh = parse_bed_mesh(text)
-    mesh = smooth_surface_laplacian_partial(mesh, smooth_iterations)
+    mesh = smooth_surface_laplacian_partial(mesh, iterations=1, lam=0.6)
     mesh = interpolate_surface(mesh, resolution)
     return generate_stl_from_surface(mesh, output_path)
 
@@ -39,6 +39,6 @@ min_y: 5.0
 max_y: 345.0
 """
 
-    stl_path = "/mnt/data/bed_mesh_from_text.stl"
+    stl_path = "./bed_mesh_from_text.stl"
     generate_stl_from_bed_mesh_text(text, resolution=50, output_path=stl_path)
     stl_path
