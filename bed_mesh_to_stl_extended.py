@@ -4,9 +4,12 @@ sys.path.append("/mnt/data")
 from parse_bed_mesh import parse_bed_mesh
 from interpolate_bed_mesh_surface import interpolate_surface_with_extension
 from generate_stl_from_surface import generate_stl_from_surface
+from smooth_surface import smooth_surface_laplacian
 
-def generate_stl_from_bed_mesh_text(text: str, resolution: int = 50, edge_offset: float = 0.2, output_path: str = "bed_mesh_model.stl") -> str:
+
+def generate_stl_from_bed_mesh_text(text: str, smooth_iterations: int = 3, resolution: int = 50, edge_offset: float = 0.2, output_path: str = "bed_mesh_model.stl") -> str:
     mesh = parse_bed_mesh(text)
+    mesh = smooth_surface_laplacian(mesh, smooth_iterations)
     mesh = interpolate_surface_with_extension(mesh, resolution, edge_offset)
     return generate_stl_from_surface(mesh, output_path)
 
