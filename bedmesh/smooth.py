@@ -1,5 +1,5 @@
 import numpy as np
-from parse_bed_mesh import SurfaceMesh
+from bedmesh.parse import SurfaceMesh
 
 def smooth_surface_laplacian(mesh: SurfaceMesh, iterations: int = 3) -> SurfaceMesh:
     """

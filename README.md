@@ -21,11 +21,11 @@
 
 До установки прокладки:
 
-![Before](bed-mesh-before.png)
+![Before](.assets/bed-mesh-before.png)
 
 После установки прокладки:
 
-![After](bed-mesh-after.png)
+![After](.assets/bed-mesh-after.png)
 
 ## Практические советы
 
@@ -43,7 +43,7 @@ python bed_mesh_to_stl_extended.py > bed_mesh_data.txt
 или
 
 ```python
-from bed_mesh_to_stl_extended import generate_stl_from_bed_mesh_text
+from cli.bed_mesh_to_stl_extended import generate_stl_from_bed_mesh_text
 
 generate_stl_from_bed_mesh_text(
     text=your_bed_mesh_text,
@@ -55,11 +55,16 @@ generate_stl_from_bed_mesh_text(
 
 ## Структура
 
-- `parse_bed_mesh.py` — парсинг текстовой карты высот
-- `interpolate_bed_mesh_surface.py` — интерполяция и экстраполяция
-- `generate_stl_from_surface.py` — генерация STL-модели
-- `bed_mesh_to_stl_strict.py` — генерация STL без выхода за границы карты
-- `bed_mesh_to_stl_extended.py` — генерация STL с расширением за границы (у меня карта получается 340x340, а стол 350x350, расширение позволяет заполнить весь стол)
+- `bedmesh/` — библиотека для работы с `bed_mesh`
+  - `parse.py` — парсинг текстовой карты высот
+  - `interpolate.py` — интерполяция и экстраполяция
+  - `smooth.py` — сглаживание поверхности
+  - `apply_to_gcode.py` — применение карты кривизны к G-code
+  - `stl_export.py` — генерация STL-модели из поверхности
+- `cli/` — запускаемые скрипты
+  - `bed_mesh_to_stl_strict.py` — генерация STL без выхода за границы карты
+  - `bed_mesh_to_stl_extended.py` — генерация STL с расширением за границы
+- `tests/` — модульные тесты
 
 ## Лицензия
 
