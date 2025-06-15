@@ -1,6 +1,8 @@
-from dataclasses import dataclass
-import numpy as np
 import re
+from dataclasses import dataclass
+
+import numpy as np
+
 
 @dataclass
 class SurfaceMesh:

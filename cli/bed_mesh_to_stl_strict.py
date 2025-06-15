@@ -1,10 +1,10 @@
 # import sys
 # sys.path.append("/mnt/data")
 
-from bedmesh.parse import parse_bed_mesh
 from bedmesh.interpolate import interpolate_surface
-from bedmesh.stl_export import generate_stl_from_surface
+from bedmesh.parse import parse_bed_mesh
 from bedmesh.smooth import smooth_surface_laplacian_partial
+from bedmesh.stl_export import generate_stl_from_surface
 
 
 def generate_stl_from_bed_mesh_text(text: str, resolution: int = 50, output_path: str = "bed_mesh_model.stl") -> str:
@@ -12,6 +12,7 @@ def generate_stl_from_bed_mesh_text(text: str, resolution: int = 50, output_path
     mesh = smooth_surface_laplacian_partial(mesh, iterations=1, lam=0.6)
     mesh = interpolate_surface(mesh, resolution)
     return generate_stl_from_surface(mesh, output_path)
+
 
 if __name__ == "__main__":
     text = """

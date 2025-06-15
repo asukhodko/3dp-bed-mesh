@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
+
 from bedmesh.parse import SurfaceMesh
+
 
 def _make_interpolator_grid(mesh: SurfaceMesh) -> RectBivariateSpline:
     """
@@ -8,9 +10,10 @@ def _make_interpolator_grid(mesh: SurfaceMesh) -> RectBivariateSpline:
     """
     return RectBivariateSpline(mesh.y, mesh.x, mesh.z, kx=3, ky=3)
 
+
 def interpolate_surface(
-    mesh: SurfaceMesh,
-    resolution: int = 50
+        mesh: SurfaceMesh,
+        resolution: int = 50
 ) -> SurfaceMesh:
     """
     Интерполяция внутри области bed_mesh (min..max).
@@ -29,10 +32,11 @@ def interpolate_surface(
 
     return SurfaceMesh(x=x_new, y=y_new, z=z_interp, z_top=z_top)
 
+
 def interpolate_surface_with_extension(
-    mesh: SurfaceMesh,
-    resolution: int = 50,
-    edge_offset: float = 0.0
+        mesh: SurfaceMesh,
+        resolution: int = 50,
+        edge_offset: float = 0.0
 ) -> SurfaceMesh:
     """
     Интерполяция с экстраполяцией.

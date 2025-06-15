@@ -1,7 +1,9 @@
-from typing import List
-from scipy.interpolate import RectBivariateSpline
-from typing import Dict, Union
 import math
+from typing import List, Dict, Union
+
+from scipy.interpolate import RectBivariateSpline
+
+from bedmesh.parse import SurfaceMesh
 
 
 def parse_gcode_line(line: str) -> Dict[str, Union[str, float]]:
@@ -60,3 +62,67 @@ def split_move(start: Dict[str, float], end: Dict[str, float], max_dist: float) 
         }
         segments.append(segment)
     return segments
+
+
+def collapse_segments(segments: List[Dict[str, float]], split_delta_z: float) -> List[Dict[str, float]]:
+    if not segments:
+        return []
+
+    result = [segments[0]]
+    for seg in segments[1:]:
+        prev = result[-1]
+        if abs(seg["Z"] - prev["Z"]) > split_delta_z:
+            result.append(seg)
+        else:
+            result[-1] = seg
+    return result
+
+
+def apply_bed_mesh_to_gcode(
+        gcode_lines: List[str],
+        surface: SurfaceMesh,
+        move_check_distance: float = 1.0,
+        split_delta_z: float = 0.01
+) -> List[str]:
+    interpolator = RectBivariateSpline(surface.y, surface.x, surface.z)
+    output_lines = []
+    last_pos: Dict[str, Union[float, None]] = {"X": 0.0, "Y": 0.0, "Z": 0.0, "E": 0.0, "F": None}
+
+    for line in gcode_lines:
+        stripped = line.strip()
+        if not stripped or stripped.startswith(";") or stripped.startswith("M") or stripped.startswith(
+                "T") or "EXCLUDE_OBJECT" in stripped:
+            output_lines.append(line)
+            continue
+
+        cmd = parse_gcode_line(stripped)
+        if not cmd or cmd["cmd"] not in {"G0", "G1"}:
+            output_lines.append(line)
+            continue
+
+        start = last_pos.copy()
+        end = last_pos.copy()
+        end.update({k: v for k, v in cmd.items() if k in "XYZE"})
+
+        segments = split_move(start, end, move_check_distance)
+
+        prev = start
+        for seg in segments:
+            x = seg.get("X", prev["X"])
+            y = seg.get("Y", prev["Y"])
+            delta_z = interpolate_surface_z(interpolator, x, y)
+            base_z = seg.get("Z", prev["Z"])
+            seg["Z"] = base_z + delta_z
+            prev = seg
+
+        segments = collapse_segments(segments, split_delta_z)
+
+        for seg in segments:
+            merged = {**{"cmd": cmd["cmd"]}, **seg}
+            if "F" in cmd:
+                merged["F"] = cmd["F"]
+            output_lines.append(format_gcode_line(merged["cmd"], merged))
+
+        last_pos.update(end)
+
+    return output_lines

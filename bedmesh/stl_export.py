@@ -1,6 +1,8 @@
 import numpy as np
 import trimesh
+
 from bedmesh.parse import SurfaceMesh
+
 
 def generate_stl_from_surface(mesh: SurfaceMesh, output_path: str) -> str:
     """

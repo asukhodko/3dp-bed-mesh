@@ -1,5 +1,7 @@
 import numpy as np
+
 from bedmesh.parse import SurfaceMesh
+
 
 def smooth_surface_laplacian(mesh: SurfaceMesh, iterations: int = 3) -> SurfaceMesh:
     """
@@ -18,13 +20,14 @@ def smooth_surface_laplacian(mesh: SurfaceMesh, iterations: int = 3) -> SurfaceM
         z_new = z.copy()
         # внутренняя часть
         z_new[1:-1, 1:-1] = 0.25 * (
-            z[:-2, 1:-1] + z[2:, 1:-1] +
-            z[1:-1, :-2] + z[1:-1, 2:]
+                z[:-2, 1:-1] + z[2:, 1:-1] +
+                z[1:-1, :-2] + z[1:-1, 2:]
         )
         z = z_new
 
     z_top = float(np.max(z))
     return SurfaceMesh(x=mesh.x.copy(), y=mesh.y.copy(), z=z, z_top=z_top)
+
 
 def smooth_surface_laplacian_partial(mesh: SurfaceMesh, iterations: int = 3, lam: float = 0.4) -> SurfaceMesh:
     """
@@ -42,8 +45,8 @@ def smooth_surface_laplacian_partial(mesh: SurfaceMesh, iterations: int = 3, lam
     z = mesh.z.copy()
     for _ in range(iterations):
         neighbors_mean = 0.25 * (
-            z[:-2, 1:-1] + z[2:, 1:-1] +
-            z[1:-1, :-2] + z[1:-1, 2:]
+                z[:-2, 1:-1] + z[2:, 1:-1] +
+                z[1:-1, :-2] + z[1:-1, 2:]
         )
         z_new = z.copy()
         z_new[1:-1, 1:-1] = (1 - lam) * z[1:-1, 1:-1] + lam * neighbors_mean
